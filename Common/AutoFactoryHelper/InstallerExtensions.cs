@@ -3,7 +3,7 @@ using Autofac;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Services.AutoFactoryHelper;
+namespace Common.AutoFactoryHelper;
 
 public static class InstallerExtensions
 {

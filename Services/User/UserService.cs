@@ -1,9 +1,11 @@
+using System.Security.Claims;
 using Dtos;
 using Mapster;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 
-namespace Services;
+namespace Services.User;
 
 public interface IUserService
 {
@@ -12,20 +14,23 @@ public interface IUserService
     List<UserInfoDto> GetUsers();
     Task<IdentityResult> UpdateUser(UserEditDto userEditDto);
     Task<SignInResult> Authenticate(AuthenticateRequestDto authenticateRequestDto);
+    Task<IdentityUser> GetCurrentUser();
 }
 
 public class UserService : IUserService
 {
-    private readonly ILogger _logger;
+    private readonly ILogger<UserService> _logger;
     private readonly UserManager<IdentityUser> _userManager;
     private readonly SignInManager<IdentityUser> _signInManager;
+    private readonly IHttpContextAccessor _httpContextAccessor;
 
     public UserService(ILogger<UserService> logger, UserManager<IdentityUser> userManager,
-        SignInManager<IdentityUser> signInManager)
+        SignInManager<IdentityUser> signInManager, IHttpContextAccessor httpContextAccessor)
     {
         _logger = logger;
         _userManager = userManager;
         _signInManager = signInManager;
+        _httpContextAccessor = httpContextAccessor;
     }
 
     public async Task<UserInfoDto> GetUser(string id)
@@ -107,6 +112,25 @@ public class UserService : IUserService
         }
 
         return result;
+    }
+
+    public async Task<IdentityUser> GetCurrentUser()
+    {
+        var userId = _httpContextAccessor.HttpContext?.User?.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (userId == null)
+        {
+            _logger.Log(LogLevel.Critical, "No signed in user");
+            throw new ArgumentException("No signed in user");
+        }
+
+        var user = await _userManager.FindByIdAsync(userId);
+        if (user == null)
+        {
+            _logger.Log(LogLevel.Critical, $"Current user with id '{userId}' not found");
+            throw new ArgumentException($"Current user with id '{userId}' not found");
+        }
+
+        return user;
     }
 
     private string HashPassword(IdentityUser user, string password)

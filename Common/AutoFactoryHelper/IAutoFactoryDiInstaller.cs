@@ -3,7 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 // ReSharper disable UnusedParameter.Global
-namespace Services.AutoFactoryHelper;
+namespace Common.AutoFactoryHelper;
 
 /// <summary>
 /// Create a file called: SetupDependencyInjection.cs in every folder you want to register the classes. And implement this interface.

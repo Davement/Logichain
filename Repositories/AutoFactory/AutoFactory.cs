@@ -1,10 +1,10 @@
 ﻿using System.Reflection;
 using Autofac;
+using Common.AutoFactoryHelper;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Services.AutoFactoryHelper;
 
-namespace Migrations.AutoFactory;
+namespace Repositories.AutoFactory;
 
 public static class AutoFactory
 {

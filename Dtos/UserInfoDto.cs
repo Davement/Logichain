@@ -1,4 +1,5 @@
-﻿namespace Dtos;
+﻿#pragma warning disable CS8618
+namespace Dtos;
 
 public class UserInfoDto
 {

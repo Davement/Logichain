@@ -1,9 +1,10 @@
 using Dtos;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Services;
+using Services.User;
+using DbContext = Migrations.DbContext;
 
-namespace Migrations.Database;
+namespace Services.Database;
 
 public class DatabaseService
 {

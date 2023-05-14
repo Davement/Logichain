@@ -1,8 +1,8 @@
 ﻿using System.Reflection;
 using Autofac;
+using Common.AutoFactoryHelper;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Services.AutoFactoryHelper;
 
 namespace Services.AutoFactory;
 

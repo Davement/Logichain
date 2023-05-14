@@ -1,6 +1,7 @@
 using Dtos;
 using Microsoft.AspNetCore.Mvc;
 using Services;
+using Services.User;
 using SignInResult = Microsoft.AspNetCore.Identity.SignInResult;
 
 namespace Logichain.Controllers.v1;

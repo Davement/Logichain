@@ -1,10 +1,10 @@
 using System.Reflection;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
+using Common.AutoFactoryHelper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.OpenApi.Models;
 using Migrations;
-using Services.AutoFactoryHelper;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -59,7 +59,7 @@ builder.Host.ConfigureContainer<ContainerBuilder>(containerBuilder =>
 {
     containerBuilder.AddInstallersFromAssemblies(configuration, Assembly.GetExecutingAssembly(), builder.Services);
     Services.AutoFactory.AutoFactory.Configure(containerBuilder, configuration, builder.Services);
-    Migrations.AutoFactory.AutoFactory.Configure(containerBuilder, configuration, builder.Services);
+    Repositories.AutoFactory.AutoFactory.Configure(containerBuilder, configuration, builder.Services);
 });
 
 
