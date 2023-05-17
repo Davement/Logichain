@@ -1,5 +1,6 @@
 using Dtos;
 using Mapster;
+using Microsoft.Extensions.Logging;
 using Models;
 using Repositories.MasterData;
 
@@ -7,51 +8,75 @@ namespace Services.MasterData;
 
 public interface ILocationService
 {
-    LocationInfoDto CreateLocation(LocationEditDto locationEditDto);
-    IList<LocationInfoDto> GetLocations();
-    LocationInfoDto GetLocationById(Guid id);
-    LocationInfoDto UpdateLocation(LocationEditDto locationEditDto);
-    bool DeleteLocation(Guid id);
+    Task<IList<LocationInfoDto>> GetLocations();
+    Task<LocationInfoDto> GetLocationById(Guid id);
+    Task<Guid> CreateLocation(LocationEditDto locationEditDto);
+    Task<Guid> UpdateLocation(LocationEditDto locationEditDto);
+    Task<bool> DeleteLocation(Guid id);
 }
 
 public class LocationService : ILocationService
 {
+    private readonly ILogger<LocationService> _logger;
     private readonly ILocationRepository _locationRepository;
 
-    public LocationService(ILocationRepository locationRepository)
+    public LocationService(ILocationRepository locationRepository, ILogger<LocationService> logger)
     {
         _locationRepository = locationRepository;
+        _logger = logger;
     }
 
-    public IList<LocationInfoDto> GetLocations()
+    public async Task<IList<LocationInfoDto>> GetLocations()
     {
-        var locations = _locationRepository.GetList<Location>();
+        var locations = await _locationRepository.GetList<Location>();
         return locations.Adapt<IList<LocationInfoDto>>();
     }
 
-    public LocationInfoDto GetLocationById(Guid id)
+    public async Task<LocationInfoDto> GetLocationById(Guid id)
     {
-        var location = _locationRepository.GetById<Location>(id);
+        var location = await _locationRepository.GetById<Location>(id);
         return location.Adapt<LocationInfoDto>();
     }
 
-    public LocationInfoDto CreateLocation(LocationEditDto locationEditDto)
+    public async Task<Guid> CreateLocation(LocationEditDto locationEditDto)
     {
         var location = locationEditDto.Adapt<Location>();
-        var result = _locationRepository.Add(location);
-        return result.Adapt<LocationInfoDto>();
+        var parentLocationExists = await _locationRepository.CheckIfItemExists<Location>(locationEditDto.ParentId);
+        if (locationEditDto.ParentId != Guid.Empty && parentLocationExists)
+        {
+            location.Parent = new Location { Id = locationEditDto.ParentId };
+        }
+        else if (!parentLocationExists)
+        {
+            throw new UserException(ErrorCodes.ParentLocationNotFound, $"Parent location not found with id '{locationEditDto.ParentId}'");
+        }
+
+        var result = await _locationRepository.Add(location);
+        _logger.Log(LogLevel.Information, $"Location '{result.Name}' created with id '{result.Id}'");
+        return result.Id;
     }
 
-    public LocationInfoDto UpdateLocation(LocationEditDto locationEditDto)
+    public async Task<Guid> UpdateLocation(LocationEditDto locationEditDto)
     {
         var location = locationEditDto.Adapt<Location>();
-        var result = _locationRepository.Update(location);
-        return result.Adapt<LocationInfoDto>();
+        var parentLocationExists = await _locationRepository.CheckIfItemExists<Location>(locationEditDto.ParentId);
+        if (locationEditDto.ParentId != Guid.Empty && parentLocationExists)
+        {
+            location.Parent = new Location { Id = locationEditDto.ParentId };
+        }
+        else if (!parentLocationExists)
+        {
+            throw new UserException(ErrorCodes.ParentLocationNotFound, $"Parent location not found with id '{locationEditDto.ParentId}'");
+        }
+
+        var result = await _locationRepository.Update(location);
+        _logger.Log(LogLevel.Information, $"Location '{result.Name}' updated with id '{result.Id}'");
+        return result.Id;
     }
 
-    public bool DeleteLocation(Guid id)
+    public async Task<bool> DeleteLocation(Guid id)
     {
-        _locationRepository.Delete(new Location { Id = id });
+        await _locationRepository.Delete(new Location { Id = id });
         return true;
     }
 }

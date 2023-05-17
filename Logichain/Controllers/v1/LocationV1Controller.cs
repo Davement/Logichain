@@ -6,7 +6,7 @@ namespace Logichain.Controllers.v1;
 
 [Route("api/v1/locations")]
 [Produces("application/json")]
-public class LocationV1Controller
+public class LocationV1Controller : BaseController
 {
     private readonly ILocationService _locationService;
 
@@ -16,32 +16,33 @@ public class LocationV1Controller
     }
     
     [HttpGet]
-    public IList<LocationInfoDto> GetLocations()
+    public async Task<IList<LocationInfoDto>> GetLocations()
     {
-        return _locationService.GetLocations();
+        return await _locationService.GetLocations();
     }
     
     [HttpGet("{id:guid}")]
-    public LocationInfoDto GetLocationById(Guid id)
+    public async Task<LocationInfoDto> GetLocationById(Guid id)
     {
-        return _locationService.GetLocationById(id);
+        return await _locationService.GetLocationById(id);
     }
 
     [HttpPost]
-    public void CreateLocation(LocationEditDto locationEditDto)
+    public async Task<IActionResult> CreateLocation(LocationEditDto locationEditDto)
     {
-        _locationService.CreateLocation(locationEditDto);
+        var result = await _locationService.CreateLocation(locationEditDto);
+        return Created(result);
     }
     
     [HttpPut]
-    public void UpdateLocation(LocationEditDto locationEditDto)
+    public async Task<Guid> UpdateLocation(LocationEditDto locationEditDto)
     {
-        _locationService.UpdateLocation(locationEditDto);
+        return await _locationService.UpdateLocation(locationEditDto);
     }
     
     [HttpDelete("{id:guid}")]
-    public void DeleteLocation(Guid id)
+    public async Task DeleteLocation(Guid id)
     {
-        _locationService.DeleteLocation(id);
+        await _locationService.DeleteLocation(id);
     }
 }

@@ -2,6 +2,7 @@ using System.Reflection;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using Common.AutoFactoryHelper;
+using Logichain.Middlewares;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.OpenApi.Models;
 using Migrations;
@@ -77,6 +78,7 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseDefaultFiles();
 app.UseStaticFiles();
+app.UseMiddleware<ErrorHandlingMiddleware>();
 
 app.UseCors();
 app.UseRouting();

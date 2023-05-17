@@ -4,6 +4,7 @@ using Mapster;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
+using Models;
 
 namespace Services.User;
 
@@ -119,15 +120,13 @@ public class UserService : IUserService
         var userId = _httpContextAccessor.HttpContext?.User?.FindFirstValue(ClaimTypes.NameIdentifier);
         if (userId == null)
         {
-            _logger.Log(LogLevel.Critical, "No signed in user");
-            throw new ArgumentException("No signed in user");
+            throw new UserException(ErrorCodes.NotAuthenticated, "No signed in user");
         }
 
         var user = await _userManager.FindByIdAsync(userId);
         if (user == null)
         {
-            _logger.Log(LogLevel.Critical, $"Current user with id '{userId}' not found");
-            throw new ArgumentException($"Current user with id '{userId}' not found");
+            throw new UserException(ErrorCodes.NotFound, $"Current user with id '{userId}' not found");
         }
 
         return user;

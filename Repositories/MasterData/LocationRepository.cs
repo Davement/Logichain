@@ -1,14 +1,17 @@
-﻿using DbContext = Migrations.DbContext;
+﻿using Microsoft.EntityFrameworkCore;
+using Models;
+using DbContext = Migrations.DbContext;
 
 namespace Repositories.MasterData;
 
 public interface ILocationRepository
 {
-    IList<T> GetList<T>() where T : class;
-    T GetById<T>(Guid id) where T : class;
-    T Add<T>(T entity) where T : class;
-    T Update<T>(T entity) where T : class;
-    T Delete<T>(T entity) where T : class;
+    Task<List<T>> GetList<T>() where T : BaseEntity;
+    Task<T> GetById<T>(Guid id) where T : BaseEntity;
+    Task<T> Add<T>(T entity, bool detachRelations = true) where T : BaseEntity;
+    Task<T> Update<T>(T entity, bool detachRelations = true) where T : BaseEntity;
+    Task<int> Delete<T>(T entity) where T : BaseEntity;
+    Task<bool> CheckIfItemExists<T>(Guid id) where T : BaseEntity;
 }
 
 public class LocationRepository : BaseRepository, ILocationRepository

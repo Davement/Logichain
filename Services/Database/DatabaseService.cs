@@ -1,6 +1,8 @@
 using Dtos;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Models;
+using Services.MasterData;
 using Services.User;
 using DbContext = Migrations.DbContext;
 
@@ -8,17 +10,19 @@ namespace Services.Database;
 
 public class DatabaseService
 {
-    private readonly ILogger _logger;
+    private readonly ILogger<DatabaseService> _logger;
     private readonly DbContext _dbContext;
     private readonly IUserService _userService;
-    
+    private readonly ILocationService _locationService;
+
     private bool IsDatabaseNew { get; set; }
 
-    public DatabaseService(ILogger<DatabaseService> logger, DbContext dbContext, IUserService userService)
+    public DatabaseService(ILogger<DatabaseService> logger, DbContext dbContext, IUserService userService, ILocationService locationService)
     {
         _logger = logger;
         _dbContext = dbContext;
         _userService = userService;
+        _locationService = locationService;
         CheckDatabaseConnection();
     }
 
@@ -37,7 +41,7 @@ public class DatabaseService
         }
         else
         {
-            _logger.Log(LogLevel.Critical, "Cannot connect to database");
+            throw new UserException(ErrorCodes.InternalServerError, "Cannot connect to database");
         }
     }
 
@@ -60,6 +64,7 @@ public class DatabaseService
     {
         _logger.Log(LogLevel.Information, "Seeding database...");
         await CreateAdminUser();
+        CreateCompanyLocation();
         _logger.Log(LogLevel.Information, "Seeding database successfully");
     }
 
@@ -69,6 +74,18 @@ public class DatabaseService
         {
             UserName = "admin",
             Password = "123",
+        });
+    }
+
+    private void CreateCompanyLocation()
+    {
+        _locationService.CreateLocation(new LocationEditDto
+        {
+            Number = 1,
+            Name = "Company",
+            LocationType = LocationTypes.Company,
+            ParentId = Guid.Empty,
+            Active = true
         });
     }
 }
