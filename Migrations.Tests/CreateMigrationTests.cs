@@ -1,10 +1,11 @@
 using System.Diagnostics;
+#pragma warning disable CS0162
 
 namespace Migrations.Test;
 
-public class CreateMigrationTest
+public class CreateMigrationTests
 {
-    private const string MigrationName = "AddedLocations";
+    private const string MigrationName = "NAME";
 
     [Test]
     public void CreateMigration()
@@ -35,7 +36,7 @@ public class CreateMigrationTest
 
     private static string GetMigrationsPath()
     {
-        var endPathIndex = Directory.GetCurrentDirectory().IndexOf("Migrations.Test", StringComparison.Ordinal);
+        var endPathIndex = Directory.GetCurrentDirectory().IndexOf("Migrations.Tests", StringComparison.Ordinal);
         return Directory.GetCurrentDirectory().Substring(0, endPathIndex) + "Migrations";
     }
 }

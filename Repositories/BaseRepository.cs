@@ -51,6 +51,10 @@ public abstract class BaseRepository
         {
             _dbContext.DetachRelations(entity);
         }
+        else
+        {
+            UpdateRelationalBaseEntities(entity);
+        }
 
         UpdateBaseEntity(entity);
 
@@ -78,6 +82,34 @@ public abstract class BaseRepository
     private void UpdateBaseEntity<T>(T entity) where T : BaseEntity
     {
         entity.IsUpdated();
-        _dbContext.Entry(entity).Property(x => entity.Created).IsModified = false;
+        _dbContext.Entry(entity).Property(x => x.Created).IsModified = false;
+    }
+
+    private void UpdateRelationalBaseEntities<T>(T entity) where T : BaseEntity
+    {
+        var properties = typeof(T).GetProperties();
+
+        foreach (var property in properties)
+        {
+            if (typeof(BaseEntity).IsAssignableFrom(property.PropertyType))
+            {
+                if (property.GetValue(entity) is BaseEntity childEntity)
+                {
+                    UpdateBaseEntity(childEntity);
+                }
+            }
+            else if (typeof(IEnumerable<BaseEntity>).IsAssignableFrom(property.PropertyType))
+            {
+                if (property.GetValue(entity) is not IEnumerable<BaseEntity> childEntities)
+                {
+                    continue;
+                };
+                
+                foreach (var childEntity in childEntities)
+                {
+                    UpdateBaseEntity(childEntity);
+                }
+            }
+        }
     }
 }
