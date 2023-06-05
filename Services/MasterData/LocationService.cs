@@ -28,20 +28,20 @@ public class LocationService : ILocationService
 
     public async Task<IList<LocationInfoDto>> GetLocations()
     {
-        var locations = await _locationRepository.GetList<Location>();
+        var locations = await _locationRepository.GetList();
         return locations.Adapt<IList<LocationInfoDto>>();
     }
 
     public async Task<LocationInfoDto> GetLocationById(Guid id)
     {
-        var location = await _locationRepository.GetById<Location>(id);
+        var location = await _locationRepository.GetById(id);
         return location.Adapt<LocationInfoDto>();
     }
 
     public async Task<Guid> CreateLocation(LocationEditDto locationEditDto)
     {
         var location = locationEditDto.Adapt<Location>();
-        var parentLocationExists = locationEditDto.ParentId == Guid.Empty || await _locationRepository.CheckIfItemExists<Location>(locationEditDto.ParentId);
+        var parentLocationExists = locationEditDto.ParentId == Guid.Empty || await _locationRepository.CheckIfItemExists(locationEditDto.ParentId);
         if (locationEditDto.ParentId != Guid.Empty && parentLocationExists)
         {
             location.Parent = new Location { Id = locationEditDto.ParentId };
@@ -59,7 +59,7 @@ public class LocationService : ILocationService
     public async Task<Guid> UpdateLocation(LocationEditDto locationEditDto)
     {
         var location = locationEditDto.Adapt<Location>();
-        var parentLocationExists = locationEditDto.ParentId == Guid.Empty || await _locationRepository.CheckIfItemExists<Location>(locationEditDto.ParentId);
+        var parentLocationExists = locationEditDto.ParentId == Guid.Empty || await _locationRepository.CheckIfItemExists(locationEditDto.ParentId);
         if (locationEditDto.ParentId != Guid.Empty && parentLocationExists)
         {
             location.Parent = new Location { Id = locationEditDto.ParentId };

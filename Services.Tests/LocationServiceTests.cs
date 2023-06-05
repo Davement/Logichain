@@ -12,9 +12,9 @@ namespace Services.Tests;
 [TestFixture]
 public class LocationServiceTests
 {
-    private Mock<ILogger<LocationService>> _loggerMock;
-    private Mock<ILocationRepository> _locationRepositoryMock;
-    private ILocationService _locationService;
+    private Mock<ILogger<LocationService>> _loggerMock = null!;
+    private Mock<ILocationRepository> _locationRepositoryMock = null!;
+    private ILocationService _locationService = null!;
 
     [SetUp]
     public void Setup()
@@ -37,7 +37,7 @@ public class LocationServiceTests
             CreateLocationModel(1, "Location 1"),
             CreateLocationModel(2, "Location 2")
         };
-        _locationRepositoryMock.Setup(r => r.GetList<Location>()).ReturnsAsync(locations);
+        _locationRepositoryMock.Setup(r => r.GetList()).ReturnsAsync(locations);
 
         // Act
         var result = await _locationService.GetLocations();
@@ -53,7 +53,7 @@ public class LocationServiceTests
     {
         // Arrange
         var location = CreateLocationModel(1, "Location 1");
-        _locationRepositoryMock.Setup(r => r.GetById<Location>(location.Id)).ReturnsAsync(location);
+        _locationRepositoryMock.Setup(r => r.GetById(location.Id)).ReturnsAsync(location);
 
         // Act
         var result = await _locationService.GetLocationById(location.Id);
@@ -72,7 +72,7 @@ public class LocationServiceTests
         var createdLocation = CreateLocationModel(1, "Location 1");
         location.Parent = new Location { Id = locationEditDto.ParentId };
 
-        _locationRepositoryMock.Setup(r => r.CheckIfItemExists<Location>(locationEditDto.ParentId)).ReturnsAsync(true);
+        _locationRepositoryMock.Setup(r => r.CheckIfItemExists(locationEditDto.ParentId)).ReturnsAsync(true);
         _locationRepositoryMock.Setup(r => r.Add(It.IsAny<Location>(), true)).ReturnsAsync(createdLocation);
 
         // Act
@@ -80,7 +80,7 @@ public class LocationServiceTests
 
         // Assert
         result.Should().Be(createdLocation.Id);
-        _locationRepositoryMock.Verify(r => r.CheckIfItemExists<Location>(locationEditDto.ParentId), Times.Once);
+        _locationRepositoryMock.Verify(r => r.CheckIfItemExists(locationEditDto.ParentId), Times.Once);
         _locationRepositoryMock.Verify(r => r.Add(It.IsAny<Location>(), true), Times.Once);
     }
 
@@ -96,7 +96,7 @@ public class LocationServiceTests
 
         // Assert
         await act.Should().NotThrowAsync<UserException>();
-        _locationRepositoryMock.Verify(r => r.CheckIfItemExists<Location>(locationEditDto.ParentId), Times.Never);
+        _locationRepositoryMock.Verify(r => r.CheckIfItemExists(locationEditDto.ParentId), Times.Never);
         _locationRepositoryMock.Verify(r => r.Add(It.IsAny<Location>(), true), Times.Once);
     }
 
@@ -106,7 +106,7 @@ public class LocationServiceTests
         // Arrange
         var locationEditDto = CreateLocationEditDto(1, "Location 1");
         locationEditDto.ParentId = Guid.NewGuid();
-        _locationRepositoryMock.Setup(r => r.CheckIfItemExists<Location>(locationEditDto.ParentId)).ReturnsAsync(false);
+        _locationRepositoryMock.Setup(r => r.CheckIfItemExists(locationEditDto.ParentId)).ReturnsAsync(false);
 
         // Act
         var act = async () => await _locationService.CreateLocation(locationEditDto);
@@ -114,7 +114,7 @@ public class LocationServiceTests
         // Assert
         await act.Should().ThrowAsync<UserException>()
             .WithMessage($"Parent location not found with id '{locationEditDto.ParentId}'");
-        _locationRepositoryMock.Verify(r => r.CheckIfItemExists<Location>(locationEditDto.ParentId), Times.Once);
+        _locationRepositoryMock.Verify(r => r.CheckIfItemExists(locationEditDto.ParentId), Times.Once);
         _locationRepositoryMock.Verify(r => r.Add(It.IsAny<Location>(), true), Times.Never);
     }
 
@@ -123,10 +123,9 @@ public class LocationServiceTests
     {
         // Arrange
         var locationEditDto = CreateLocationEditDto(1, "Location 1");
-        var location = locationEditDto.Adapt<Location>();
         var updatedLocation = CreateLocationModel(1, "Location 1");
 
-        _locationRepositoryMock.Setup(r => r.CheckIfItemExists<Location>(locationEditDto.ParentId)).ReturnsAsync(true);
+        _locationRepositoryMock.Setup(r => r.CheckIfItemExists(locationEditDto.ParentId)).ReturnsAsync(true);
         _locationRepositoryMock.Setup(r => r.Update(It.IsAny<Location>(), true)).ReturnsAsync(updatedLocation);
 
         // Act
@@ -134,7 +133,7 @@ public class LocationServiceTests
 
         // Assert
         result.Should().Be(updatedLocation.Id);
-        _locationRepositoryMock.Verify(r => r.CheckIfItemExists<Location>(locationEditDto.ParentId), Times.Once);
+        _locationRepositoryMock.Verify(r => r.CheckIfItemExists(locationEditDto.ParentId), Times.Once);
         _locationRepositoryMock.Verify(r => r.Update(It.IsAny<Location>(), true), Times.Once);
     }
 
@@ -150,7 +149,7 @@ public class LocationServiceTests
 
         // Assert
         await act.Should().NotThrowAsync<UserException>();
-        _locationRepositoryMock.Verify(r => r.CheckIfItemExists<Location>(locationEditDto.ParentId), Times.Never);
+        _locationRepositoryMock.Verify(r => r.CheckIfItemExists(locationEditDto.ParentId), Times.Never);
         _locationRepositoryMock.Verify(r => r.Update(It.IsAny<Location>(), true), Times.Once);
     }
 
@@ -160,7 +159,7 @@ public class LocationServiceTests
         // Arrange
         var locationEditDto = CreateLocationEditDto(1, "Location 1");
         locationEditDto.ParentId = Guid.NewGuid();
-        _locationRepositoryMock.Setup(r => r.CheckIfItemExists<Location>(locationEditDto.ParentId)).ReturnsAsync(false);
+        _locationRepositoryMock.Setup(r => r.CheckIfItemExists(locationEditDto.ParentId)).ReturnsAsync(false);
 
         // Act
         var act = async () => await _locationService.UpdateLocation(locationEditDto);
@@ -168,7 +167,7 @@ public class LocationServiceTests
         // Assert
         await act.Should().ThrowAsync<UserException>()
             .WithMessage($"Parent location not found with id '{locationEditDto.ParentId}'");
-        _locationRepositoryMock.Verify(r => r.CheckIfItemExists<Location>(locationEditDto.ParentId), Times.Once);
+        _locationRepositoryMock.Verify(r => r.CheckIfItemExists(locationEditDto.ParentId), Times.Once);
         _locationRepositoryMock.Verify(r => r.Update(It.IsAny<Location>(), true), Times.Never);
     }
 
@@ -177,7 +176,7 @@ public class LocationServiceTests
     {
         // Arrange
         var locationId = Guid.NewGuid();
-        _locationRepositoryMock.Setup(r => r.Delete<Location>(new Location { Id = locationId }));
+        _locationRepositoryMock.Setup(r => r.Delete(new Location { Id = locationId }));
 
         // Act
         var result = await _locationService.DeleteLocation(locationId);

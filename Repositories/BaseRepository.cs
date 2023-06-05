@@ -5,7 +5,7 @@ using DbContext = Migrations.DbContext;
 
 namespace Repositories;
 
-public abstract class BaseRepository
+public abstract class BaseRepository<T> where T : BaseEntity
 {
     private readonly DbContext _dbContext;
 
@@ -14,12 +14,12 @@ public abstract class BaseRepository
         _dbContext = dbContext;
     }
 
-    public virtual async Task<List<T>> GetList<T>() where T : BaseEntity
+    public virtual async Task<List<T>> GetList()
     {
         return await _dbContext.Set<T>().ToListAsync();
     }
 
-    public virtual async Task<T> GetById<T>(Guid id) where T : BaseEntity
+    public virtual async Task<T> GetById(Guid id)
     {
         var result = await _dbContext.Set<T>().FindAsync(id);
         if (result == null)
@@ -30,7 +30,7 @@ public abstract class BaseRepository
         return result;
     }
 
-    public virtual async Task<T> Add<T>(T entity, bool detachRelations = true) where T : BaseEntity
+    public virtual async Task<T> Add(T entity, bool detachRelations = true)
     {
         _dbContext.Set<T>().Add(entity);
 
@@ -43,7 +43,7 @@ public abstract class BaseRepository
         return entity;
     }
 
-    public virtual async Task<T> Update<T>(T entity, bool detachRelations = true) where T : BaseEntity
+    public virtual async Task<T> Update(T entity, bool detachRelations = true)
     {
         _dbContext.Set<T>().Update(entity);
 
@@ -62,7 +62,7 @@ public abstract class BaseRepository
         return entity;
     }
 
-    public virtual async Task<int> Delete<T>(T entity) where T : BaseEntity
+    public virtual async Task<int> Delete(T entity)
     {
         _dbContext.Set<T>().Remove(entity);
         var result = await _dbContext.SaveChangesAsync();
@@ -74,18 +74,18 @@ public abstract class BaseRepository
         return result;
     }
 
-    public virtual async Task<bool> CheckIfItemExists<T>(Guid id) where T : BaseEntity
+    public virtual async Task<bool> CheckIfItemExists(Guid id)
     {
         return await _dbContext.Set<T>().AnyAsync(x => x.Id == id);
     }
 
-    private void UpdateBaseEntity<T>(T entity) where T : BaseEntity
+    private void UpdateBaseEntity(BaseEntity entity)
     {
         entity.IsUpdated();
         _dbContext.Entry(entity).Property(x => x.Created).IsModified = false;
     }
 
-    private void UpdateRelationalBaseEntities<T>(T entity) where T : BaseEntity
+    private void UpdateRelationalBaseEntities(T entity)
     {
         var properties = typeof(T).GetProperties();
 
@@ -103,8 +103,8 @@ public abstract class BaseRepository
                 if (property.GetValue(entity) is not IEnumerable<BaseEntity> childEntities)
                 {
                     continue;
-                };
-                
+                }
+
                 foreach (var childEntity in childEntities)
                 {
                     UpdateBaseEntity(childEntity);

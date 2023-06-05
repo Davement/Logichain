@@ -72,7 +72,7 @@ public class BaseRepositoryTests
         var entity = await _locationRepository.Add(location);
         
         // Act
-        var result = await _locationRepository.GetList<Location>();
+        var result = await _locationRepository.GetList();
         
         // Assert
         result.Should().NotBeNull();
@@ -85,7 +85,7 @@ public class BaseRepositoryTests
     public async Task WhenGetById_ThenShouldReturnItem()
     {
         // Act
-        var result = await _locationRepository.GetById<Location>(_createdLocation.Id);
+        var result = await _locationRepository.GetById(_createdLocation.Id);
         
         // Assert
         result.Should().NotBeNull();
