@@ -120,7 +120,7 @@ public class UserService : IUserService
         var userId = _httpContextAccessor.HttpContext?.User?.FindFirstValue(ClaimTypes.NameIdentifier);
         if (userId == null)
         {
-            throw new UserException(ErrorCodes.NotAuthenticated, "No signed in user");
+            throw new UserException(ErrorCodes.Forbidden, "No signed in user");
         }
 
         var user = await _userManager.FindByIdAsync(userId);

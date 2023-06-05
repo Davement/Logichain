@@ -41,7 +41,7 @@ public class DatabaseService
         }
         else
         {
-            throw new UserException(ErrorCodes.InternalServerError, "Cannot connect to database");
+            throw new UserException(ErrorCodes.DatabaseConnectionError, "Cannot connect to database");
         }
     }
 

@@ -81,7 +81,7 @@ public abstract class BaseRepository<T> where T : BaseEntity
 
     private void UpdateBaseEntity(BaseEntity entity)
     {
-        entity.IsUpdated();
+        entity.UpdateTimestamp();
         _dbContext.Entry(entity).Property(x => x.Created).IsModified = false;
     }
 

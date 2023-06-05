@@ -4,7 +4,7 @@ namespace Logichain.Controllers;
 
 public class BaseController : Controller
 {
-    protected CreatedResult Created(object? value)
+    protected CreatedResult Created(object value)
     {
         var locationUri = new UriBuilder
         {

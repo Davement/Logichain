@@ -31,7 +31,7 @@ public class ErrorHandlingMiddleware
     {
         _logger.Log(LogLevel.Error, exception, exception.Message);
         context.Response.ContentType = "application/json";
-        var statusCode = (int)ErrorCodes.InternalServerError;
+        var statusCode = (int)HttpStatusCode.InternalServerError;
         var errorMessage = "An error has occurred. Please try again later.";
 
         if (exception is UserException userException)
@@ -51,5 +51,26 @@ public class ErrorHandlingMiddleware
         context.Response.StatusCode = statusCode;
         var result = JsonConvert.SerializeObject(new { error = errorMessage });
         return context.Response.WriteAsync(result);
+    }
+
+    private static class GetReturnError
+    {
+        public static readonly Dictionary<ErrorCodes, HttpStatusCode> MappedErrors = new()
+        {
+            // Generic
+            { ErrorCodes.Unauthorized, HttpStatusCode.Unauthorized },
+            { ErrorCodes.Forbidden, HttpStatusCode.Forbidden },
+            { ErrorCodes.NotFound, HttpStatusCode.NotFound },
+            { ErrorCodes.Conflict, HttpStatusCode.Conflict },
+            
+
+            // Bad Requests
+            { ErrorCodes.BadRequest, HttpStatusCode.BadRequest },
+            { ErrorCodes.ParentLocationNotFound, HttpStatusCode.BadRequest },
+
+            // Internal Server Error
+            { ErrorCodes.InternalServerError, HttpStatusCode.InternalServerError },
+            { ErrorCodes.DatabaseConnectionError, HttpStatusCode.InternalServerError }
+        };
     }
 }

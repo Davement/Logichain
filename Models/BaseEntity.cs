@@ -6,7 +6,7 @@ public class BaseEntity
     public DateTime Created { get; set; }
     public DateTime Updated { get; set; }
 
-    public void IsUpdated()
+    public void UpdateTimestamp()
     {
         Updated = DateTime.UtcNow;
     }
