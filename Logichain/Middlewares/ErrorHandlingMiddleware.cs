@@ -36,7 +36,7 @@ public class ErrorHandlingMiddleware
 
         if (exception is UserException userException)
         {
-            if (GetReturnError.MappedErrors.TryGetValue((ErrorCodes)userException.ErrorCode, out var returnStatusCode))
+            if (MapErrorCodes.TryGetValue((ErrorCodes)userException.ErrorCode, out var returnStatusCode))
             {
                 statusCode = (int)returnStatusCode;
             }
@@ -53,24 +53,21 @@ public class ErrorHandlingMiddleware
         return context.Response.WriteAsync(result);
     }
 
-    private static class GetReturnError
+    private static readonly Dictionary<ErrorCodes, HttpStatusCode> MapErrorCodes = new()
     {
-        public static readonly Dictionary<ErrorCodes, HttpStatusCode> MappedErrors = new()
-        {
-            // Generic
-            { ErrorCodes.Unauthorized, HttpStatusCode.Unauthorized },
-            { ErrorCodes.Forbidden, HttpStatusCode.Forbidden },
-            { ErrorCodes.NotFound, HttpStatusCode.NotFound },
-            { ErrorCodes.Conflict, HttpStatusCode.Conflict },
-            
+        // Generic
+        { ErrorCodes.Unauthorized, HttpStatusCode.Unauthorized },
+        { ErrorCodes.Forbidden, HttpStatusCode.Forbidden },
+        { ErrorCodes.NotFound, HttpStatusCode.NotFound },
+        { ErrorCodes.Conflict, HttpStatusCode.Conflict },
 
-            // Bad Requests
-            { ErrorCodes.BadRequest, HttpStatusCode.BadRequest },
-            { ErrorCodes.ParentLocationNotFound, HttpStatusCode.BadRequest },
 
-            // Internal Server Error
-            { ErrorCodes.InternalServerError, HttpStatusCode.InternalServerError },
-            { ErrorCodes.DatabaseConnectionError, HttpStatusCode.InternalServerError }
-        };
-    }
+        // Bad Requests
+        { ErrorCodes.BadRequest, HttpStatusCode.BadRequest },
+        { ErrorCodes.ParentLocationNotFound, HttpStatusCode.BadRequest },
+
+        // Internal Server Error
+        { ErrorCodes.InternalServerError, HttpStatusCode.InternalServerError },
+        { ErrorCodes.DatabaseConnectionError, HttpStatusCode.InternalServerError }
+    };
 }

@@ -8,21 +8,21 @@ namespace Logichain.Controllers.v1;
 
 [Route("api/v1/users")]
 [Produces("application/json")]
-public class UserV1Controller
+public class UserController
 {
     private readonly IUserService _userService;
 
-    public UserV1Controller(IUserService userService)
+    public UserController(IUserService userService)
     {
         _userService = userService;
     }
-    
+
     [HttpGet]
     public async Task<UserInfoDto> GetUser(string id)
     {
         return await _userService.GetUser(id);
     }
-    
+
     [HttpGet("list")]
     public List<UserInfoDto> GetUsers()
     {
@@ -40,7 +40,7 @@ public class UserV1Controller
     {
         await _userService.CreateUser(userEditDto);
     }
-    
+
     [HttpPut]
     public async Task UpdateUser(UserEditDto userEditDto)
     {

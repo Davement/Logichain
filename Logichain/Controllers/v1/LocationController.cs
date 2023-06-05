@@ -1,4 +1,5 @@
 using Dtos;
+using Dtos.MasterData;
 using Microsoft.AspNetCore.Mvc;
 using Services.MasterData;
 
@@ -6,11 +7,11 @@ namespace Logichain.Controllers.v1;
 
 [Route("api/v1/locations")]
 [Produces("application/json")]
-public class LocationV1Controller : BaseController
+public class LocationController : BaseController
 {
     private readonly ILocationService _locationService;
 
-    public LocationV1Controller(ILocationService locationService)
+    public LocationController(ILocationService locationService)
     {
         _locationService = locationService;
     }
